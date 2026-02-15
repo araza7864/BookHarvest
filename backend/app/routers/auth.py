@@ -47,7 +47,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
         vehicle_mpg=None,
     )
     user = await AuthService.create_user(db, create_data)
-    token = AuthService.create_access_token({"sub": str(user.id)})
+    token = AuthService.create_access_token({"sub": str(user.id), "role": user.role})
     return Token(
         access_token=token,
         token_type="bearer",
@@ -63,7 +63,7 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
-    token = AuthService.create_access_token({"sub": str(user.id)})
+    token = AuthService.create_access_token({"sub": str(user.id), "role": user.role})
     return Token(
         access_token=token,
         token_type="bearer",

@@ -12,6 +12,17 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("logout") === "1") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.history.replaceState({}, "", window.location.pathname);
+      window.location.reload();
+    }
+  }, []);
+
   const [user, setUserState] = useState<User | null>(() => {
     try {
       const s = localStorage.getItem('user')

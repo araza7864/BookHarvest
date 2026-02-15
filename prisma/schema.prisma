@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // "school" | "admin"
+  schoolId  String?
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  school    School?  @relation(fields: [schoolId], references: [id])
+  orders    Order[]
+}
+
+model School {
+  id         String   @id @default(cuid())
+  name       String
+  address    String?
+  city       String?
+  state      String?
+  zip        String?
+  region     String?
+  lat        Float?
+  lng        Float?
+  createdAt  DateTime @default(now())
+  users      User[]
+  orders     Order[]
+}
+
+model Book {
+  id           String   @id @default(cuid())
+  title        String
+  author       String?
+  isbn         String?  @unique
+  gradeMin     Int      // Grade level min (e.g., 1)
+  gradeMax     Int      // Grade level max (e.g., 12)
+  genre        String?  // fiction, nonfiction, children, etc.
+  theme        String?  // STEM, adventure, culture
+  diversity    String?  // representation tags
+  readingLevel String?  // Lexile or similar
+  stock        Int      @default(0)
+  bundleSize   Int      @default(40) // 40 or 80 units
+  costPerUnit  Float    @default(0)
+  coverImage   String?  // URL or path for cover
+  description  String?  // Short description
+  popularity   Int      @default(0) // For sorting by popularity
+  createdAt    DateTime @default(now())
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  schoolId      String?
+  userId        String?
+  source        String      @default("school") // school | shop
+  customerEmail String?
+  customerName  String?
+  status        String      @default("submitted") // draft, submitted, approved, packing, shipped
+  totalBooks    Int         @default(0)
+  totalStudents Int         @default(0)
+  invoiceAmount Float       @default(0)
+  paymentStatus String      @default("pending") // pending, paid
+  packingList   String?     // JSON of packing details
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  school        School?     @relation(fields: [schoolId], references: [id])
+  user          User?       @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  bookId    String
+  quantity  Int
+  grade     Int?
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book      Book    @relation(fields: [bookId], references: [id])
+}

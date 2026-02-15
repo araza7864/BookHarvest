@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Book Harvest brand palette */
+  --harvest-green: #286f55;
+  --harvest-green-light: #368a6a;
+  --harvest-green-dark: #1e483a;
+  --citrus-orange: #ea580c;
+  --citrus-orange-light: #f97316;
+  --cream-bg: #f8f9f7;
+  --warm-white: #fffbf7;
+}
+
+body {
+  background: var(--cream-bg);
+  color: #1b3b31;
+}
+
+@layer base {
+  h1, h2, h3 {
+    @apply text-harvest-900 font-semibold;
+  }
+}

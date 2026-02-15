@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { api } from '../api/client'
 import Sparkles from '../components/graphics/Sparkles'
@@ -20,6 +20,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,22 +43,32 @@ export default function Login() {
         data = res.data
       }
       login(data.access_token, data.user)
-      if (data.user.role === 'admin') navigate('/admin')
-      else navigate('/')
+      const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:3005'
+      if (data.user.role === 'admin') {
+        window.location.href = `${appUrl}/admin?token=${encodeURIComponent(data.access_token)}`
+      } else if (redirectTo === 'shop') {
+        window.location.href = `${appUrl}/shop/books?token=${encodeURIComponent(data.access_token)}`
+      } else {
+        navigate('/')
+      }
     } catch (err: any) {
-      const data = err.response?.data
-      const detail = data?.detail
-      const msg =
-        Array.isArray(detail)
-          ? detail.map((d: { msg?: string }) => d.msg).filter(Boolean).join(' ')
-          : typeof detail === 'string'
-            ? detail
-            : data != null && typeof data === 'object'
-              ? JSON.stringify(data)
-              : err.response?.status
-                ? `Error ${err.response.status}: ${err.message || 'Request failed'}`
-                : err.message || 'Something went wrong'
-      setError(msg)
+      if (!isRegister) {
+        setError('Invalid email or password')
+      } else {
+        const data = err.response?.data
+        const detail = data?.detail
+        const msg =
+          Array.isArray(detail)
+            ? detail.map((d: { msg?: string }) => d.msg).filter(Boolean).join(' ')
+            : typeof detail === 'string'
+              ? detail
+              : data != null && typeof data === 'object'
+                ? JSON.stringify(data)
+                : err.response?.status
+                  ? `Error ${err.response.status}: ${err.message || 'Request failed'}`
+                  : err.message || 'Something went wrong'
+        setError(msg)
+      }
     } finally {
       setLoading(false)
     }
@@ -109,7 +121,16 @@ export default function Login() {
           </button>
         </p>
         <p className="mt-2 text-center">
-          <Link to="/" className="text-stone-500 text-sm hover:underline">Back to home</Link>
+          {redirectTo === 'shop' ? (
+            <a
+              href={`${import.meta.env.VITE_APP_URL || 'http://localhost:3005'}/shop`}
+              className="text-stone-500 text-sm hover:underline"
+            >
+              Back to store
+            </a>
+          ) : (
+            <Link to="/" className="text-stone-500 text-sm hover:underline">Back to home</Link>
+          )}
         </p>
       </motion.div>
     </div>

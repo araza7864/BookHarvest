@@ -5,8 +5,10 @@ import { useAuth } from '../context/AuthContext'
 import Sparkles from '../components/graphics/Sparkles'
 import BookHarvestLogo from '../components/graphics/BookHarvestLogo'
 
+const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:3005'
+
 export default function PublicLayout() {
-  const { user } = useAuth()
+  const { user, token, logout } = useAuth()
   const location = useLocation()
   const [heroFindBooksVisible, setHeroFindBooksVisible] = useState(false)
 
@@ -50,19 +52,34 @@ export default function PublicLayout() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                 >
-                  <Link
-                    to="/search"
+                  <a
+                    href={`${APP_URL}/shop/books${token ? `?token=${encodeURIComponent(token)}` : ''}`}
                     className="flex flex-wrap text-harvest-dark-red border border-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base opacity-90 hover:opacity-100 transition"
                   >
                     Find Books
-                  </Link>
+                  </a>
                 </motion.div>
               )}
             </AnimatePresence>
             {user ? (
-              <div className="flex gap-3">
-                {user.role === 'admin' && <Link to="/admin" className="border border-stone-300 text-stone-700 px-3 py-1.5 rounded-lg hover:bg-stone-50 text-sm font-medium">Admin</Link>}
-                <span className="text-stone-600 text-sm">{user.name}</span>
+              <div className="flex items-center gap-3">
+                {user.role === 'admin' && (
+                  <a
+                    href={`${APP_URL}/admin${token ? `?token=${encodeURIComponent(token)}` : ''}`}
+                    className="border border-harvest-dark-red text-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base opacity-90 hover:opacity-100 transition"
+                  >
+                    Admin
+                  </a>
+                )}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <button
+                    type="button"
+                    onClick={() => { logout(); window.location.href = `${APP_URL}?logout=1` }}
+                    className="border border-harvest-dark-red text-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base hover:opacity-90 transition"
+                  >
+                    Log out
+                  </button>
+                </motion.div>
               </div>
             ) : (
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>

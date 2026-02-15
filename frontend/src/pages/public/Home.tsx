@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import AnimatedSection from '../../components/animations/AnimatedSection'
 import AnimatedCard from '../../components/animations/AnimatedCard'
@@ -100,14 +99,14 @@ export default function Home() {
                 whileTap={{ scale: 0.98 }}
                 className="inline-block"
               >
-                <Link
+                <a
                   id="hero-find-books"
-                  to="/search"
+                  href={`${import.meta.env.VITE_APP_URL || 'http://localhost:3005'}/shop/books`}
                   className="inline-block bg-white text-[rgb(144,54,23)] px-10 py-4 rounded-2xl font-display font-bold text-xl md:text-2xl shadow-lg hover:bg-white/95 transition"
                   style={{ transform: 'translateZ(12px)', backfaceVisibility: 'hidden' }}
                 >
                   Find Books
-                </Link>
+                </a>
               </motion.div>
             </div>
           </AnimatedSection>
