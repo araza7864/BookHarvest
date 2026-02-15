@@ -3,7 +3,6 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 
 import PublicLayout from './layouts/PublicLayout'
 import AdminLayout from './layouts/AdminLayout'
-import DriverLayout from './layouts/DriverLayout'
 
 import Home from './pages/public/Home'
 import Search from './pages/public/Search'
@@ -14,10 +13,6 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AdminInventory from './pages/admin/Inventory'
 import AdminDeliveries from './pages/admin/Deliveries'
 import AdminFinance from './pages/admin/Finance'
-
-import DriverJobs from './pages/driver/JobFeed'
-import DriverJobDetail from './pages/driver/JobDetail'
-import DriverCredits from './pages/driver/CreditsWallet'
 
 function RequireAuth({ children, role }: { children: React.ReactNode; role?: string }) {
   const { user, token } = useAuth()
@@ -41,11 +36,6 @@ export default function App() {
           <Route path="inventory" element={<AdminInventory />} />
           <Route path="deliveries" element={<AdminDeliveries />} />
           <Route path="finance" element={<AdminFinance />} />
-        </Route>
-        <Route path="/driver" element={<RequireAuth role="driver"><DriverLayout /></RequireAuth>}>
-          <Route index element={<DriverJobs />} />
-          <Route path="job/:id" element={<DriverJobDetail />} />
-          <Route path="credits" element={<DriverCredits />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

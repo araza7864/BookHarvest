@@ -1,38 +1,88 @@
-import { Outlet } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { Outlet, Link, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import Sparkles from '../components/graphics/Sparkles'
+import BookHarvestLogo from '../components/graphics/BookHarvestLogo'
 
 export default function PublicLayout() {
   const { user } = useAuth()
+  const location = useLocation()
+  const [heroFindBooksVisible, setHeroFindBooksVisible] = useState(false)
+
+  useEffect(() => {
+    let obs: IntersectionObserver | null = null
+    const tick = requestAnimationFrame(() => {
+      const el = document.getElementById('hero-find-books')
+      if (!el) {
+        setHeroFindBooksVisible(false)
+        return
+      }
+      obs = new IntersectionObserver(
+        ([e]) => setHeroFindBooksVisible(e.isIntersecting),
+        { threshold: 0.1, rootMargin: '0px' }
+      )
+      obs.observe(el)
+    })
+    return () => {
+      cancelAnimationFrame(tick)
+      obs?.disconnect()
+    }
+  }, [location.pathname])
+
+  const showNavFindBooks = !heroFindBooksVisible
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="bg-primary-500 text-white shadow-lg sticky top-0 z-50">
+    <div className="min-h-screen flex flex-col bg-harvest-bg-page w-full">
+      <header className="sticky top-0 z-[100] w-full bg-white shadow-md rounded-b-xl shrink-0">
         <nav className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="font-display font-bold text-xl flex items-center gap-2">
-            <span className="text-3xl">📚</span>
-            SeamlessBook
+          <Link to="/" className="flex items-center gap-3" aria-label="Home">
+            <BookHarvestLogo height={80} />
+            <span className="font-display font-bold text-[28px] text-harvest-dark-red">Book Harvest</span>
           </Link>
           <div className="flex items-center gap-4">
-            <Link to="/search" className="hover:underline font-medium">Find Books</Link>
+            <AnimatePresence mode="wait">
+              {showNavFindBooks && (
+                <motion.div
+                  key="nav-find-books"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                >
+                  <Link
+                    to="/search"
+                    className="flex flex-wrap text-harvest-dark-red border border-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base opacity-90 hover:opacity-100 transition"
+                  >
+                    Find Books
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
             {user ? (
               <div className="flex gap-3">
-                {user.role === 'admin' && <Link to="/admin" className="bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30">Admin</Link>}
-                {user.role === 'driver' && <Link to="/driver" className="bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30">Deliver</Link>}
-                <span className="text-primary-100">{user.name}</span>
+                {user.role === 'admin' && <Link to="/admin" className="border border-stone-300 text-stone-700 px-3 py-1.5 rounded-lg hover:bg-stone-50 text-sm font-medium">Admin</Link>}
+                <span className="text-stone-600 text-sm">{user.name}</span>
               </div>
             ) : (
-              <Link to="/login" className="bg-white text-primary-600 px-4 py-2 rounded-lg font-semibold hover:bg-primary-50">Log in</Link>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  to="/login"
+                  className="border border-harvest-dark-red text-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base hover:opacity-90 transition"
+                >
+                  Log in
+                </Link>
+              </motion.div>
             )}
           </div>
         </nav>
       </header>
-      <main className="flex-1">
+      <main className="flex-1 bg-harvest-bg-page overflow-x-hidden min-w-0">
         <Outlet />
       </main>
-      <footer className="bg-stone-200 py-6 text-center text-stone-600 text-sm">
-        SeamlessBook — Share Books, Spread Joy
+      <footer className="bg-harvest-bg-warm border-t border-black/10 py-8 text-center text-white/90 text-base md:text-lg relative overflow-hidden">
+        <Sparkles className="opacity-40" count={5} />
+        <span className="relative z-10">Book Harvest — Share Books, Spread Joy</span>
       </footer>
     </div>
   )

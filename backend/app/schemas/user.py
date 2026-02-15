@@ -7,8 +7,9 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
-    role: str = "user"
-    vehicle_mpg: Optional[float] = None
+    role: str = "user"  # "user" or "admin" (admin requires admin_invite_code)
+    admin_invite_code: Optional[str] = None
+    vehicle_mpg: Optional[float] = None  # unused now; kept for DB compatibility
 
 
 class UserLogin(BaseModel):

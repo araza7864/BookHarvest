@@ -1,108 +1,117 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Link, useSearchParams } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { api } from '../../api/client'
 import type { Book } from '../../api/client'
 
 export default function Search() {
-  const [q, setQ] = useState('')
-  const [age, setAge] = useState('')
-  const [category, setCategory] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const q = searchParams.get('q') ?? ''
+  const age = searchParams.get('age_range') ?? ''
+  const category = searchParams.get('category') ?? ''
+
   const [books, setBooks] = useState<Book[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [query, setQuery] = useState(q)
+  const [ageRange, setAgeRange] = useState(age)
+  const [cat, setCat] = useState(category)
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setLoading(true)
-      api.get<Book[]>('/books/search', { params: { q: q || undefined, age_range: age || undefined, category: category || undefined } })
-        .then((r) => setBooks(r.data))
-        .finally(() => setLoading(false))
-    }, 300)
-    return () => clearTimeout(t)
-  }, [q, age, category])
+    setLoading(true)
+    api
+      .get<Book[]>('/books/search', {
+        params: {
+          q: query || undefined,
+          age_range: ageRange || undefined,
+          category: cat || undefined,
+        },
+      })
+      .then((r) => setBooks(r.data))
+      .catch(() => setBooks([]))
+      .finally(() => setLoading(false))
+  }, [query, ageRange, cat])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setSearchParams(
+      { ...(query && { q: query }), ...(ageRange && { age_range: ageRange }), ...(cat && { category: cat }) },
+      { replace: true }
+    )
+  }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="font-display font-bold text-3xl text-primary-700 mb-6">
-        Find Books
-      </motion.h1>
-
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white rounded-xl shadow-md p-4 mb-8 flex flex-wrap gap-3">
-        <input
-          type="search"
-          placeholder="Search by title, author, or keyword..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="flex-1 min-w-[200px] px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-        />
-        <input
-          type="text"
-          placeholder="Age range (e.g. 5-8)"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          className="w-32 px-4 py-2 border border-stone-300 rounded-lg"
-        />
-        <input
-          type="text"
-          placeholder="Category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-36 px-4 py-2 border border-stone-300 rounded-lg"
-        />
-      </motion.div>
-
-      {loading && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-stone-200 rounded-xl h-64 animate-pulse" />
-          ))}
-        </div>
-      )}
-
-      <AnimatePresence mode="wait">
-        {!loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6"
+    <div className="min-h-screen bg-harvest-bg-page py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="font-display font-bold text-3xl mb-6" style={{ color: 'var(--tw-ring-offset-color)' }}>
+          Find Books <span className="text-base font-display font-bold text-white">To get books, log in</span>
+        </h1>
+        <form onSubmit={handleSearch} className="flex flex-wrap gap-3 mb-8">
+          <input
+            type="search"
+            placeholder="Search by keyword..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="px-4 py-2 border border-stone-300 rounded-lg flex-1 min-w-[200px]"
+          />
+          <select
+            value={ageRange}
+            onChange={(e) => setAgeRange(e.target.value)}
+            className="px-4 py-2 border border-stone-300 rounded-lg"
           >
+            <option value="">All ages</option>
+            <option value="0-3">0-3</option>
+            <option value="4-6">4-6</option>
+            <option value="7-9">7-9</option>
+            <option value="10-12">10-12</option>
+            <option value="13+">13+</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Category"
+            value={cat}
+            onChange={(e) => setCat(e.target.value)}
+            className="px-4 py-2 border border-stone-300 rounded-lg w-40"
+          />
+          <button type="submit" className="bg-harvest-dark-red text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90">
+            Search
+          </button>
+        </form>
+
+        {loading ? (
+          <p className="text-stone-500">Loading...</p>
+        ) : books.length === 0 ? (
+          <p className="text-stone-600">No books found. Try different filters.</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {books.map((book, i) => (
               <motion.div
                 key={book.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="bg-white rounded-xl shadow-md overflow-hidden border border-stone-100"
+                transition={{ delay: i * 0.05 }}
               >
-                <Link to={`/book/${book.id}`} className="block">
-                  <div className="aspect-[3/4] bg-primary-100 flex items-center justify-center text-5xl">
-                    {book.photo_url ? (
-                      <img src={book.photo_url} alt={book.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <span>📖</span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-display font-bold text-stone-800 line-clamp-2">{book.title}</h3>
-                    <p className="text-stone-500 text-sm">{book.author}</p>
-                    {book.age_range && (
-                      <span className="inline-block mt-1 px-2 py-0.5 bg-primary-100 text-primary-700 text-xs rounded">
-                        {book.age_range}
-                      </span>
-                    )}
-                  </div>
+                <Link
+                  to={`/book/${book.id}`}
+                  className="block bg-white rounded-xl shadow-md border border-stone-200 p-4 hover:shadow-lg transition"
+                >
+                  {book.photo_url ? (
+                    <img src={book.photo_url} alt="" className="w-full h-48 object-cover rounded-lg mb-3" />
+                  ) : (
+                    <div className="w-full h-48 bg-stone-200 rounded-lg mb-3 flex items-center justify-center text-stone-400 text-4xl">📚</div>
+                  )}
+                  <h2 className="font-display font-bold text-lg text-stone-800 truncate">{book.title}</h2>
+                  <p className="text-stone-600 text-sm">{book.author}</p>
+                  {(book.age_range || book.category) && (
+                    <p className="text-stone-500 text-xs mt-1">
+                      {[book.age_range, book.category].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
                 </Link>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-
-      {!loading && books.length === 0 && (
-        <p className="text-center text-stone-500 py-12">No books found. Try different filters.</p>
-      )}
+      </div>
     </div>
   )
 }

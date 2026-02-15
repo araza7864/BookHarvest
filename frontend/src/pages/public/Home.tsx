@@ -1,86 +1,166 @@
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import AnimatedSection from '../../components/animations/AnimatedSection'
+import AnimatedCard from '../../components/animations/AnimatedCard'
+import BouncyEmoji from '../../components/animations/BouncyEmoji'
+import FloatingBooks from '../../components/graphics/FloatingBooks'
+import Stars from '../../components/graphics/Stars'
+import Cloud from '../../components/graphics/Cloud'
+import BookStack from '../../components/graphics/BookStack'
+import FloatingHearts from '../../components/graphics/FloatingHearts'
+import Sun from '../../components/graphics/Sun'
+import ReadingKid from '../../components/graphics/ReadingKid'
+
+const MAX_TILT_X = 20
+const MAX_TILT_Y = 24
+const TILT_FACTOR = 0.14
 
 export default function Home() {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const btnRef = useRef<HTMLDivElement>(null)
+
+  const onMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!btnRef.current) return
+      const rect = btnRef.current.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const dx = e.clientX - cx
+      const dy = e.clientY - cy
+      const rotateY = Math.max(-MAX_TILT_Y, Math.min(MAX_TILT_Y, dx * TILT_FACTOR))
+      const rotateX = Math.max(-MAX_TILT_X, Math.min(MAX_TILT_X, -dy * TILT_FACTOR))
+      setTilt({ x: rotateX, y: rotateY })
+    },
+    []
+  )
+
+  const onMouseLeave = useCallback(() => setTilt({ x: 0, y: 0 }), [])
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => onMouseMove(e)
+    const handleLeave = () => onMouseLeave()
+    window.addEventListener('mousemove', handleMove)
+    document.addEventListener('mouseleave', handleLeave)
+    return () => {
+      window.removeEventListener('mousemove', handleMove)
+      document.removeEventListener('mouseleave', handleLeave)
+    }
+  }, [onMouseMove, onMouseLeave])
+
   return (
-    <div>
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-400 via-primary-500 to-accent-500 text-white py-20 px-4">
-        <div className="absolute inset-0 opacity-20">
+    <div className="bg-harvest-bg-page min-w-0 overflow-x-hidden">
+      <div className="flex h-2">
+        <div className="flex-1 bg-harvest-dark-teal" />
+        <div className="flex-1 bg-harvest-dark-red" />
+        <div className="flex-1 bg-harvest-green" />
+        <div className="flex-1 bg-harvest-ochre" />
+        <div className="flex-1 bg-harvest-burnt-orange" />
+      </div>
+      <section className="relative overflow-hidden bg-harvest-bg-cool text-white py-24 px-4">
+        <FloatingBooks />
+        <Stars />
+        <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-24 h-24 rounded-full bg-white" />
           <div className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-white" />
-          <div className="absolute top-1/2 left-1/3 w-16 h-16 rounded-full bg-white" />
         </div>
         <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="font-display font-bold text-4xl md:text-5xl mb-4"
-          >
-            Share Books, Spread Joy 📚
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-xl text-white/95 mb-8"
-          >
-            Find donated books for your family. Request a delivery from our volunteer drivers.
-          </motion.p>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 150, damping: 12 }}
+            className="mb-4"
           >
-            <Link
-              to="/search"
-              className="inline-block bg-white text-primary-600 px-8 py-3 rounded-xl font-display font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition"
-            >
-              Find Books
-            </Link>
+            <BookStack />
           </motion.div>
+          <AnimatedSection variant="fadeInUp" delay={0.1} className="text-center">
+            <h1 className="font-display font-bold text-4xl md:text-6xl lg:text-7xl mb-4">
+              Share Books, Spread Joy{' '}
+              <BouncyEmoji emoji="📚" delay={0.3} bounce={false} className="text-5xl md:text-6xl inline-block" />
+            </h1>
+          </AnimatedSection>
+          <AnimatedSection variant="fadeInUp" delay={0.2}>
+            <p className="text-xl md:text-2xl text-white/95 mb-6">
+              Find donated books for your family. Request a delivery from our volunteers.
+            </p>
+            <ReadingKid className="text-5xl md:text-6xl" />
+          </AnimatedSection>
+          <div className="mt-10 mb-2" />
+          <AnimatedSection variant="fadeInUp" delay={0.35}>
+            <div className="inline-block py-6 px-4" style={{ perspective: 800 }}>
+              <motion.div
+                ref={btnRef}
+                style={{
+                  rotateX: tilt.x,
+                  rotateY: tilt.y,
+                  transformStyle: 'preserve-3d',
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-block"
+              >
+                <Link
+                  id="hero-find-books"
+                  to="/search"
+                  className="inline-block bg-white text-[rgb(144,54,23)] px-10 py-4 rounded-2xl font-display font-bold text-xl md:text-2xl shadow-lg hover:bg-white/95 transition"
+                  style={{ transform: 'translateZ(12px)', backfaceVisibility: 'hidden' }}
+                >
+                  Find Books
+                </Link>
+              </motion.div>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
+      <div className="flex h-2">
+        <div className="flex-1 bg-harvest-burnt-orange" />
+        <div className="flex-1 bg-harvest-ochre" />
+        <div className="flex-1 bg-harvest-green" />
+        <div className="flex-1 bg-harvest-dark-red" />
+        <div className="flex-1 bg-harvest-dark-teal" />
+      </div>
+
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-display font-bold text-2xl text-center text-stone-800 mb-10">How it works</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <AnimatedSection variant="fadeInUp" delay={0}>
+            <h2 className="font-display font-extrabold text-4xl md:text-5xl text-center text-white drop-shadow-sm mb-12">How it works</h2>
+          </AnimatedSection>
+          <div className="grid md:grid-cols-3 gap-10">
             {[
               { step: 1, title: 'Browse', desc: 'Search our catalog by age, category, or keyword.', emoji: '🔍' },
               { step: 2, title: 'Request', desc: 'Request a delivery for the books you want.', emoji: '📦' },
-              { step: 3, title: 'Receive', desc: 'A volunteer driver brings the books to you.', emoji: '🎉' },
+              { step: 3, title: 'Access Books', desc: 'Pick up books through community book hubs and literacy programs.', emoji: '📚' },
             ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-md border border-stone-100 text-center hover:shadow-lg transition"
-              >
-                <span className="text-4xl mb-3 block">{item.emoji}</span>
-                <h3 className="font-display font-bold text-primary-600 text-lg">{item.title}</h3>
-                <p className="text-stone-600 mt-2">{item.desc}</p>
-              </motion.div>
+              <AnimatedCard key={item.step} delay={i * 0.1} className="bg-white rounded-2xl p-8 shadow-md border border-stone-100 text-center">
+                <BouncyEmoji emoji={item.emoji} delay={i * 0.1} bounce={false} className="text-6xl md:text-7xl mb-4 block" />
+                <h3 className="font-display font-bold text-harvest-text text-xl md:text-2xl">{item.title}</h3>
+                <p className="text-stone-600 mt-3 text-base md:text-lg">{item.desc}</p>
+              </AnimatedCard>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12 px-4 bg-primary-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-display font-bold text-2xl text-stone-800 mb-4">Impact in numbers</h2>
+      <section className="py-12 px-4 bg-primary-50 relative overflow-hidden">
+        <Stars className="opacity-60" />
+        <FloatingHearts className="opacity-50" />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <AnimatedSection variant="fadeInUp">
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-harvest-text mb-6">Impact in numbers</h2>
+          </AnimatedSection>
           <div className="grid grid-cols-3 gap-6">
             {[
-              { label: 'Books shared', value: '1,000+' },
-              { label: 'Families reached', value: '500+' },
-              { label: 'Volunteer drivers', value: '50+' },
+              { label: 'Books Provided', value: '3M+', emoji: '📚' },
+              { label: 'Families Reached', value: 'Thousands+', emoji: '👨‍👩‍👧‍👦' },
+              { label: 'Community Book Hubs', value: '100+', emoji: '🏠' },
             ].map((stat, i) => (
-              <motion.div key={stat.label} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="bg-white rounded-xl py-4 px-6 shadow">
-                <div className="font-display font-bold text-2xl text-primary-600">{stat.value}</div>
-                <div className="text-stone-600 text-sm">{stat.label}</div>
-              </motion.div>
+              <AnimatedCard key={stat.label} delay={i * 0.1} className="bg-white rounded-2xl py-6 px-6 shadow">
+                <BouncyEmoji emoji={stat.emoji} delay={i * 0.1} bounce={false} className="text-4xl md:text-5xl block mb-2" />
+                <div className="font-display font-bold text-2xl md:text-3xl text-harvest-burnt-orange">{stat.value}</div>
+                <div className="text-stone-600 text-base">{stat.label}</div>
+              </AnimatedCard>
             ))}
           </div>
         </div>

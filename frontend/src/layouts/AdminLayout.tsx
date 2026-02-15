@@ -8,7 +8,7 @@ export default function AdminLayout() {
     <div className="min-h-screen flex bg-stone-100">
       <aside className="w-56 bg-stone-800 text-white flex flex-col">
         <div className="p-4 border-b border-stone-600">
-          <span className="font-display font-bold">SeamlessBook</span>
+          <span className="font-display font-bold">Book Harvest</span>
           <span className="block text-stone-400 text-sm">Admin</span>
         </div>
         <nav className="p-2 flex-1">

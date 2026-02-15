@@ -1,6 +1,6 @@
-# SeamlessBook — Smart Book Distribution & Volunteer Delivery Platform
+# Book Harvest — Smart Book Distribution & Volunteer Delivery Platform
 
-Full-stack system for distributing donated books to families: searchable catalog, admin dashboard, and student volunteer delivery app with credits and MPG cost estimation.
+Full-stack system for distributing donated books to families: searchable catalog, admin dashboard, and volunteer delivery.
 
 ## Stack
 
@@ -16,8 +16,9 @@ Create a database and set:
 
 ```bash
 # Backend .env (copy from backend/.env.example)
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/seamlessbook
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/bookharvest
 SECRET_KEY=your-secret-key
+ADMIN_INVITE_CODE=your-secret-admin-code   # optional; required for admin signup
 OPENROUTESERVICE_API_KEY=  # optional, for route distance
 ```
 
@@ -46,7 +47,7 @@ Open http://localhost:3000. The app proxies `/api` to the backend (port 8000).
 
 ### 4. First admin user
 
-Register at http://localhost:3000/login with role **Admin**. Use that account to add books and create deliveries.
+Set `ADMIN_INVITE_CODE` in backend `.env`, then register at http://localhost:3000/login with role **Admin** and enter that code. Regular users can register with role **User** (no code needed).
 
 ## Project structure
 
@@ -62,8 +63,8 @@ frontend/
   src/
     api/          # axios client, types
     context/      # AuthContext
-    layouts/      # Public, Admin, Driver
-    pages/        # public (Home, Search, BookDetail), admin, driver
+    layouts/      # Public, Admin
+    pages/        # public (Home, Search, BookDetail), admin
 ```
 
 ## API overview
@@ -79,5 +80,4 @@ frontend/
 
 - **Public catalog:** Kid-friendly UI, search/filter, book detail, request delivery
 - **Admin:** Dashboard KPIs, inventory table, deliveries Kanban, finance (credits issued)
-- **Driver app:** Job feed, accept/start/complete, MPG estimator and net profit, credits wallet
 - **AI/automation:** ISBN lookup (Open Library) for auto-categorization; OpenRouteService for distance (when API key set)

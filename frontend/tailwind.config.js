@@ -4,12 +4,51 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Fredoka"', 'system-ui', 'sans-serif'],
-        body: ['"Nunito"', 'system-ui', 'sans-serif'],
+        display: ['"Source Serif 4"', 'Georgia', 'serif'],
+        body: ['"Source Sans 3"', 'system-ui', 'sans-serif'],
+        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
       },
       colors: {
-        primary: { 50: '#fef7ee', 100: '#fdedd6', 200: '#f9d7ad', 300: '#f4ba78', 400: '#ee9242', 500: '#ea761e', 600: '#db5c14', 700: '#b54412', 800: '#903617', 900: '#742f16', 950: '#3f150a' },
-        accent: { 50: '#f0fdf9', 100: '#ccfbef', 200: '#99f6df', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a', 950: '#042f2e' },
+        primary: {
+          50: '#e8f2f2',
+          100: '#cce5e6',
+          200: '#99cbcc',
+          300: '#66b1b3',
+          400: '#4C7D7F',
+          500: '#3d6466',
+          600: '#2e4b4d',
+          700: '#1f3233',
+          800: '#0f191a',
+          900: '#0a1112',
+          950: '#050809',
+        },
+        accent: {
+          50: '#f9eceb',
+          100: '#f2d9d6',
+          200: '#e5b3ad',
+          300: '#d88d85',
+          400: '#8C4037',
+          500: '#70332c',
+          600: '#542621',
+          700: '#381a16',
+          800: '#1c0d0b',
+          900: '#0f0706',
+          950: '#080403',
+        },
+        harvest: {
+          /* Logo book spines & brand (match bookharvest-logo.png) */
+          'dark-teal': '#4C7D7F',
+          'dark-red': '#903617', /* rgb(144, 54, 23) */
+          green: '#6b8f6c',
+          ochre: '#D1B168',
+          'burnt-orange': '#C77A4B',
+          /* Hero/background from logo */
+          'bg-warm': '#95483E',
+          'bg-cool': '#4C7D7F',
+          'bg-page': '#95483E',
+          border: '#ADD8E6',
+          text: '#000000',
+        },
       },
       animation: {
         'bounce-soft': 'bounce-soft 2s ease-in-out infinite',
