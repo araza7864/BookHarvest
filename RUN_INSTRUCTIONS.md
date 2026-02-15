@@ -8,8 +8,9 @@ Follow these steps in order. You need **PostgreSQL**, **Python 3.10+**, and **No
 
 You need a running PostgreSQL database and its connection URL.
 
-### Option A — PostgreSQL on your PC (Windows)
+### Option A — PostgreSQL on your PC
 
+**Windows:**
 1. Download and install from: https://www.postgresql.org/download/windows/
 2. During setup, set a password for the `postgres` user and remember it.
 3. Open **pgAdmin** or **Command Prompt** and create a database named `bookharvest`:
@@ -18,7 +19,24 @@ You need a running PostgreSQL database and its connection URL.
      ```bash
      psql -U postgres -c "CREATE DATABASE bookharvest;"
      ```
-4. Your URL will look like (replace `YourPassword` with the password you set):
+
+**macOS:**
+1. Install via Homebrew: `brew install postgresql@16` (or latest), then `brew services start postgresql@16`
+2. Create the database:
+   ```bash
+   createdb bookharvest
+   ```
+   Or with `psql`:
+   ```bash
+   psql postgres -c "CREATE DATABASE bookharvest;"
+   ```
+3. Your URL (replace `YourPassword` with your macOS user password if using peer auth, or use a configured user):
+   ```
+   postgresql+asyncpg://localhost:5432/bookharvest
+   ```
+   Or with password: `postgresql+asyncpg://postgres:YourPassword@localhost:5432/bookharvest`
+
+**Both:** Your URL will look like:
    ```
    postgresql+asyncpg://postgres:YourPassword@localhost:5432/bookharvest
    ```
@@ -51,11 +69,17 @@ All commands below are run in a terminal (PowerShell or Command Prompt).
 
 ### 2.1 Open the backend folder
 
+**Windows:**
 ```bash
-cd C:\Users\asadr\seamlessbook\backend
+cd C:\Users\asadr\SeamlessBook\backend
 ```
 
-(Use your actual path to the project if different; e.g. `SeamlessBook` or `bookharvest`.)
+**macOS:**
+```bash
+cd /Users/yourusername/SeamlessBook/backend
+```
+
+(Use your actual path to the project if different.)
 
 ### 2.2 Create a virtual environment
 
@@ -73,6 +97,11 @@ python -m venv venv
 **Windows (Command Prompt):**
 ```cmd
 venv\Scripts\activate.bat
+```
+
+**macOS / Linux:**
+```bash
+source venv/bin/activate
 ```
 
 You should see `(venv)` at the start of the line.
@@ -125,8 +154,14 @@ Open a **second** terminal (backend keeps running in the first).
 
 ### 3.1 Go to the frontend folder
 
+**Windows:**
 ```bash
-cd C:\Users\asadr\seamlessbook\frontend
+cd C:\Users\asadr\SeamlessBook\frontend
+```
+
+**macOS:**
+```bash
+cd /Users/yourusername/SeamlessBook/frontend
 ```
 
 (Use your actual path to the project if different.)
@@ -160,6 +195,51 @@ The React app runs on port 3000 and forwards API calls to the backend on port 80
 
 ---
 
+## Step 3.5: Next.js (Shop & Admin) — optional but recommended
+
+The **Find Books** button opens the Next.js shop. To run it:
+
+### 3.5.1 Open the project root
+
+**Windows:**
+```bash
+cd C:\Users\asadr\SeamlessBook
+```
+
+**macOS:**
+```bash
+cd /Users/yourusername/SeamlessBook
+```
+
+### 3.5.2 Create `.env` for Next.js
+
+Create a `.env` file in the project root with:
+```
+DATABASE_URL="file:./dev.db"
+NEXT_PUBLIC_HOMEPAGE_URL="http://localhost:3000"
+```
+
+### 3.5.3 Install dependencies and set up the database
+
+```bash
+npm install
+npx prisma generate
+npx prisma db push
+npx prisma db seed
+```
+
+(Optionally run `npx tsx prisma/seed-books.ts` to add sample books.)
+
+### 3.5.4 Start Next.js
+
+```bash
+npm run dev
+```
+
+Next.js runs on **http://localhost:3005**. The homepage **Find Books** button links here.
+
+---
+
 ## Step 4: Test the app
 
 ### 4.1 Create a user (regular)
@@ -186,21 +266,21 @@ The React app runs on port 3000 and forwards API calls to the backend on port 80
 4. Optionally: Age range, Category, Description, Photo URL.
 5. Click **Save**. The book appears in the table.
 
-### 4.4 Create a delivery (Admin)
+### 4.4 Create a request (Admin)
 
-1. Click **Deliveries** in the menu.
-2. Click **New delivery**.
+1. Click **Requests** in the menu.
+2. Click **New request**.
 3. Enter:
    - **Book ID:** the ID of the book you added (e.g. 1).
-   - **Dropoff location:** e.g. “123 Main St”.
+   - **Pick-up location (hub):** e.g. “123 Main St”.
    - **Credit reward:** e.g. 5.
 4. Click **Create**. The job appears in the **Pending** column.
 
 ### 4.5 Test the public catalog
 
 1. Go to **http://localhost:3000** (or click the Book Harvest logo).
-2. Use **Find Books** to open the search page.
-3. You should see the book you added; click it to see the detail page and **Request delivery**.
+2. Use **Find Books** to open the shop (Next.js on port 3005).
+3. You should see books; click one to see the detail page and **Request** or add to cart.
 
 ---
 
@@ -208,11 +288,15 @@ The React app runs on port 3000 and forwards API calls to the backend on port 80
 
 | What              | URL / Command |
 |-------------------|----------------|
-| Website           | http://localhost:3000 |
-| Login / Register   | http://localhost:3000/login |
+| Homepage          | http://localhost:3000 |
+| Login / Register  | http://localhost:3000/login |
+| Shop (Find Books) | http://localhost:3005 |
 | API docs          | http://localhost:8000/docs |
-| Backend (start)    | `cd backend` → activate venv → `uvicorn main:app --reload --port 8000` |
-| Frontend (start)   | `cd frontend` → `npm run dev` |
+| Backend (start)   | `cd backend` → activate venv → `uvicorn main:app --reload --port 8000` |
+| Frontend (start)  | `cd frontend` → `npm run dev` |
+| Next.js (start)   | In project root: `npm run dev` (port 3005) |
+
+**macOS venv activate:** `source venv/bin/activate`
 
 ---
 

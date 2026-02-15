@@ -14,7 +14,7 @@ export default function AdminLayout() {
         <nav className="p-2 flex-1">
           <NavLink to="/admin" end className={({ isActive }) => `block px-3 py-2 rounded-lg mb-1 ${isActive ? 'bg-primary-600' : 'hover:bg-stone-700'}`}>Dashboard</NavLink>
           <NavLink to="/admin/inventory" className={({ isActive }) => `block px-3 py-2 rounded-lg mb-1 ${isActive ? 'bg-primary-600' : 'hover:bg-stone-700'}`}>Inventory</NavLink>
-          <NavLink to="/admin/deliveries" className={({ isActive }) => `block px-3 py-2 rounded-lg mb-1 ${isActive ? 'bg-primary-600' : 'hover:bg-stone-700'}`}>Deliveries</NavLink>
+          <NavLink to="/admin/deliveries" className={({ isActive }) => `block px-3 py-2 rounded-lg mb-1 ${isActive ? 'bg-primary-600' : 'hover:bg-stone-700'}`}>Requests</NavLink>
           <NavLink to="/admin/finance" className={({ isActive }) => `block px-3 py-2 rounded-lg mb-1 ${isActive ? 'bg-primary-600' : 'hover:bg-stone-700'}`}>Finance</NavLink>
         </nav>
         <div className="p-3 border-t border-stone-600">

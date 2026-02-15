@@ -35,16 +35,16 @@ export default function AdminDeliveries() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="font-display font-bold text-2xl text-stone-800">Deliveries</h1>
-        <button onClick={() => setCreating(true)} className="bg-primary-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-600">New delivery</button>
+        <h1 className="font-display font-bold text-2xl text-stone-800">Requests</h1>
+        <button onClick={() => setCreating(true)} className="bg-primary-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-600">New request</button>
       </div>
 
       {creating && (
         <motion.form initial={{ opacity: 0 }} animate={{ opacity: 1 }} onSubmit={create} className="bg-white rounded-xl shadow p-6 mb-6 border">
-          <h2 className="font-display font-bold mb-4">Create delivery</h2>
+          <h2 className="font-display font-bold mb-4">Create request</h2>
           <div className="grid grid-cols-2 gap-4">
             <input type="number" placeholder="Book ID" value={bookId} onChange={(e) => setBookId(e.target.value)} required className="px-3 py-2 border rounded-lg" />
-            <input placeholder="Dropoff location" value={dropoff} onChange={(e) => setDropoff(e.target.value)} className="px-3 py-2 border rounded-lg" />
+            <input placeholder="Pick-up location (hub)" value={dropoff} onChange={(e) => setDropoff(e.target.value)} className="px-3 py-2 border rounded-lg" />
             <input type="number" step="0.5" placeholder="Credit reward" value={creditReward} onChange={(e) => setCreditReward(e.target.value)} className="px-3 py-2 border rounded-lg" />
           </div>
           <div className="mt-4 flex gap-2">
@@ -60,7 +60,7 @@ export default function AdminDeliveries() {
         <div className="grid grid-cols-4 gap-4">
           {COLS.map((status) => (
             <div key={status} className="bg-stone-100 rounded-xl p-4 min-h-[200px]">
-              <h3 className="font-display font-bold text-stone-700 capitalize mb-3">{status.replace('_', ' ')}</h3>
+              <h3 className="font-display font-bold text-stone-700 capitalize mb-3">{status === 'in_transit' ? 'Ready for pickup' : status === 'delivered' ? 'Picked up' : status.replace('_', ' ')}</h3>
               <div className="space-y-2">
                 {byStatus(status).map((j) => (
                   <motion.div

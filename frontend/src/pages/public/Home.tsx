@@ -74,13 +74,12 @@ export default function Home() {
           </motion.div>
           <AnimatedSection variant="fadeInUp" delay={0.1} className="text-center">
             <h1 className="font-display font-bold text-4xl md:text-6xl lg:text-7xl mb-4">
-              Share Books, Spread Joy{' '}
-              <BouncyEmoji emoji="📚" delay={0.3} bounce={false} className="text-5xl md:text-6xl inline-block" />
+              Share Books, Spread Joy
             </h1>
           </AnimatedSection>
           <AnimatedSection variant="fadeInUp" delay={0.2}>
             <p className="text-xl md:text-2xl text-white/95 mb-6">
-              Find donated books for your family. Request a delivery from our volunteers.
+              Find donated books for your family. Browse and pick up books at community hubs.
             </p>
             <ReadingKid className="text-5xl md:text-6xl" />
           </AnimatedSection>
@@ -129,8 +128,8 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-10">
             {[
               { step: 1, title: 'Browse', desc: 'Search our catalog by age, category, or keyword.', emoji: '🔍' },
-              { step: 2, title: 'Request', desc: 'Request a delivery for the books you want.', emoji: '📦' },
-              { step: 3, title: 'Access Books', desc: 'Pick up books through community book hubs and literacy programs.', emoji: '📚' },
+              { step: 2, title: 'Request', desc: 'Request the books you want.', emoji: '📖' },
+              { step: 3, title: 'Access Books', desc: 'Pick up books through community book hubs and literacy programs.', emoji: '📍' },
             ].map((item, i) => (
               <AnimatedCard key={item.step} delay={i * 0.1} className="bg-white rounded-2xl p-8 shadow-md border border-stone-100 text-center">
                 <BouncyEmoji emoji={item.emoji} delay={i * 0.1} bounce={false} className="text-6xl md:text-7xl mb-4 block" />
@@ -151,7 +150,7 @@ export default function Home() {
           </AnimatedSection>
           <div className="grid grid-cols-3 gap-6">
             {[
-              { label: 'Books Provided', value: '3M+', emoji: '📚' },
+              { label: 'Books Provided', value: '3M+', emoji: '🌟' },
               { label: 'Families Reached', value: 'Thousands+', emoji: '👨‍👩‍👧‍👦' },
               { label: 'Community Book Hubs', value: '100+', emoji: '🏠' },
             ].map((stat, i) => (
