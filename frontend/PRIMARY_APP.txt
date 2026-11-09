@@ -1,0 +1,1 @@
+This repository showcases the React frontend in frontend/ and FastAPI backend in backend/. See ../README.md for setup.

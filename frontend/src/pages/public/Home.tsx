@@ -5,10 +5,8 @@ import AnimatedCard from '../../components/animations/AnimatedCard'
 import BouncyEmoji from '../../components/animations/BouncyEmoji'
 import FloatingBooks from '../../components/graphics/FloatingBooks'
 import Stars from '../../components/graphics/Stars'
-import Cloud from '../../components/graphics/Cloud'
 import BookStack from '../../components/graphics/BookStack'
 import FloatingHearts from '../../components/graphics/FloatingHearts'
-import Sun from '../../components/graphics/Sun'
 import ReadingKid from '../../components/graphics/ReadingKid'
 
 const MAX_TILT_X = 20
@@ -100,7 +98,7 @@ export default function Home() {
               >
                 <a
                   id="hero-find-books"
-                  href={`${import.meta.env.VITE_APP_URL || 'http://localhost:3005'}/shop/books`}
+                  href="/search"
                   className="inline-block bg-white text-[rgb(144,54,23)] px-10 py-4 rounded-2xl font-display font-bold text-xl md:text-2xl shadow-lg hover:bg-white/95 transition"
                   style={{ transform: 'translateZ(12px)', backfaceVisibility: 'hidden' }}
                 >

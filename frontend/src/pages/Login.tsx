@@ -28,47 +28,59 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      let data: { access_token: string; user: User }
+      let data: { access_token?: string; accessToken?: string; user: User }
       if (isRegister) {
-        const res = await api.post<{ access_token: string; user: User }>('/auth/register', {
+        const res = await api.post<{ access_token?: string; accessToken?: string; user: User }>('/auth/register', {
           name,
           email,
           password,
           role,
           admin_invite_code: role === 'admin' ? adminInviteCode : undefined,
         })
-        data = res.data
+        data = res.data as { access_token?: string; user: User }
       } else {
-        const res = await api.post<{ access_token: string; user: User }>('/auth/login', { email, password })
-        data = res.data
+        const res = await api.post<{ access_token?: string; accessToken?: string; user: User }>('/auth/login', { email, password })
+        data = res.data as { access_token?: string; user: User }
       }
-      login(data.access_token, data.user)
-      const appUrl = import.meta.env.VITE_APP_URL || 'http://localhost:3005'
+      const token = data?.access_token ?? (data as { accessToken?: string })?.accessToken
+      if (!token || !data?.user) {
+        setError('Invalid response from server. Check backend is running (http://localhost:8000/health).')
+        return
+      }
+      login(token, data.user)
       if (data.user.role === 'admin') {
-        window.location.href = `${appUrl}/admin?token=${encodeURIComponent(data.access_token)}`
+        navigate('/admin', { replace: true })
       } else if (redirectTo === 'shop') {
-        window.location.href = `${appUrl}/shop/books?token=${encodeURIComponent(data.access_token)}`
+        navigate('/search', { replace: true })
       } else {
-        navigate('/')
+        navigate('/', { replace: true })
       }
     } catch (err: any) {
-      if (!isRegister) {
-        setError('Invalid email or password')
+      const data = err.response?.data
+      const detail = data?.detail
+      const status = err.response?.status
+      const is401 = status === 401
+      const isLogin = !isRegister
+      // For login, only show "Invalid email or password" for actual 401; otherwise show real error
+      let msg: string
+      if (isLogin && is401) {
+        msg = 'Invalid email or password'
       } else {
-        const data = err.response?.data
-        const detail = data?.detail
-        const msg =
+        msg =
           Array.isArray(detail)
             ? detail.map((d: { msg?: string }) => d.msg).filter(Boolean).join(' ')
             : typeof detail === 'string'
               ? detail
               : data != null && typeof data === 'object'
                 ? JSON.stringify(data)
-                : err.response?.status
-                  ? `Error ${err.response.status}: ${err.message || 'Request failed'}`
-                  : err.message || 'Something went wrong'
-        setError(msg)
+                : status
+                  ? `Error ${status}: ${err.message || 'Request failed'}`
+                  : err.message || 'Request failed'
+        if (!err.response) {
+          msg = `Cannot reach server. Is the backend running? Start it with: cd backend && uvicorn main:app --reload --port 8000. (${msg})`
+        }
       }
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -123,7 +135,7 @@ export default function Login() {
         <p className="mt-2 text-center">
           {redirectTo === 'shop' ? (
             <a
-              href={`${import.meta.env.VITE_APP_URL || 'http://localhost:3005'}/shop`}
+              href="/search"
               className="text-stone-500 text-sm hover:underline"
             >
               Back to store

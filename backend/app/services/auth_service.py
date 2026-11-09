@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -8,17 +8,28 @@ from app.config import settings
 from app.models.user import User
 from app.schemas.user import UserCreate
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Bcrypt only supports passwords up to 72 bytes
+BCRYPT_MAX_BYTES = 72
+
+
+def _password_bytes(password: str) -> bytes:
+    pwd_bytes = password.encode("utf-8")
+    if len(pwd_bytes) > BCRYPT_MAX_BYTES:
+        raise ValueError("Password exceeds bcrypt maximum length")
+    return pwd_bytes
 
 
 class AuthService:
     @staticmethod
     def hash_password(password: str) -> str:
-        return pwd_context.hash(password)
+        return bcrypt.hashpw(_password_bytes(password), bcrypt.gensalt()).decode("utf-8")
 
     @staticmethod
     def verify_password(plain: str, hashed: str) -> bool:
-        return pwd_context.verify(plain, hashed)
+        try:
+            return bcrypt.checkpw(_password_bytes(plain), hashed.encode("utf-8"))
+        except Exception:
+            return False
 
     @staticmethod
     def create_access_token(data: dict) -> str:

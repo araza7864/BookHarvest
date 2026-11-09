@@ -5,10 +5,9 @@ import { useAuth } from '../context/AuthContext'
 import Sparkles from '../components/graphics/Sparkles'
 import BookHarvestLogo from '../components/graphics/BookHarvestLogo'
 
-const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:3005'
 
 export default function PublicLayout() {
-  const { user, token, logout } = useAuth()
+  const { user, logout } = useAuth()
   const location = useLocation()
   const [heroFindBooksVisible, setHeroFindBooksVisible] = useState(false)
 
@@ -53,7 +52,7 @@ export default function PublicLayout() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                 >
                   <a
-                    href={`${APP_URL}/shop/books${token ? `?token=${encodeURIComponent(token)}` : ''}`}
+                    href="/search"
                     className="flex flex-wrap text-harvest-dark-red border border-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base opacity-90 hover:opacity-100 transition"
                   >
                     Find Books
@@ -64,17 +63,17 @@ export default function PublicLayout() {
             {user ? (
               <div className="flex items-center gap-3">
                 {user.role === 'admin' && (
-                  <a
-                    href={`${APP_URL}/admin${token ? `?token=${encodeURIComponent(token)}` : ''}`}
+                  <Link
+                    to="/admin"
                     className="border border-harvest-dark-red text-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base opacity-90 hover:opacity-100 transition"
                   >
                     Admin
-                  </a>
+                  </Link>
                 )}
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <button
                     type="button"
-                    onClick={() => { logout(); window.location.href = `${APP_URL}?logout=1` }}
+                    onClick={() => { logout(); window.location.href = '/' }}
                     className="border border-harvest-dark-red text-harvest-dark-red px-4 py-2 rounded-lg font-medium text-base hover:opacity-90 transition"
                   >
                     Log out

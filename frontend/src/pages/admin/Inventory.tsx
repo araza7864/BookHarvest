@@ -12,7 +12,7 @@ export default function AdminInventory() {
 
   const load = () => {
     setLoading(true)
-    api.get<Book[]>('/books', { params: { limit: 200 } }).then((r) => setBooks(r.data)).finally(() => setLoading(false))
+    api.get<Book[]>('/books', { params: { limit: 100 } }).then((r) => setBooks(r.data)).finally(() => setLoading(false))
   }
 
   useEffect(() => load(), [])

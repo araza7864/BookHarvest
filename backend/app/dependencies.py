@@ -19,7 +19,11 @@ async def get_current_user_optional(
     payload = AuthService.decode_token(creds.credentials)
     if not payload or "sub" not in payload:
         return None
-    user = await AuthService.get_user_by_id(db, int(payload["sub"]))
+    try:
+        user_id = int(payload["sub"])
+    except (TypeError, ValueError):
+        return None
+    user = await AuthService.get_user_by_id(db, user_id)
     return user
 
 

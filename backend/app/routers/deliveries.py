@@ -6,7 +6,7 @@ from app.schemas.delivery import DeliveryCreate, DeliveryResponse
 from app.services.delivery_service import DeliveryService
 from app.services.book_service import BookService
 from app.services.openroute_service import OpenRouteService
-from app.dependencies import get_current_user, RequireAdmin, RequireDriver
+from app.dependencies import get_current_user, RequireAdmin, RequireDriver, RequireAdminOrDriver
 from app.models.user import User
 from app.models.delivery_job import DeliveryJob
 
@@ -51,7 +51,7 @@ async def list_deliveries(
     limit: int = Query(100, ge=1, le=200),
     status: str | None = None,
     db: AsyncSession = Depends(get_db),
-    current: User = Depends(get_current_user),
+    current: User = Depends(RequireAdminOrDriver),
 ):
     driver_id = current.id if current.role == "driver" else None
     if current.role == "user":
@@ -64,11 +64,13 @@ async def list_deliveries(
 async def get_delivery(
     job_id: int,
     db: AsyncSession = Depends(get_db),
-    current: User = Depends(get_current_user),
+    current: User = Depends(RequireAdminOrDriver),
 ):
     job = await DeliveryService.get_by_id(db, job_id)
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Delivery not found")
+    if current.role == "driver" and job.assigned_driver_id != current.id:
+        raise HTTPException(status_code=403, detail="Not your delivery")
     return _delivery_to_response(job)
 
 
